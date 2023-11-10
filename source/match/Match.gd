@@ -1,7 +1,7 @@
 extends Node3D
 
 const Structure = preload("res://source/match/units/Structure.gd")
-const Player = preload("res://source/match/model/Player.gd")
+const Player = preload("res://source/match/data-model/Player.gd")
 
 const HumanController = preload("res://source/match/players/human/Human.tscn")
 const SimpleClairvoyantAIController = preload(
@@ -130,6 +130,7 @@ func _plug_custom_map(custom_map):
 	remove_child(map)
 	map.queue_free()
 	map = custom_map
+	map.owner = self
 
 
 func _create_players():

@@ -19,8 +19,8 @@ This game is not going to be a very advanced RTS that would compete with other g
  - [x] deathmatch mode (human vs AI or AI vs AI)
  - [x] runtime player switching
  - [x] basic fog of war
- - [ ] units disappearing in fog of war
- - [ ] minimap
+ - [x] units disappearing in fog of war
+ - [x] minimap
  - [x] swarm movement to position
  - [ ] swarm movement to unit
  - [x] simple UI
@@ -51,6 +51,14 @@ Everyone is free to fix bugs or perform refactoring just by opening PR. As for f
 
 ### Core contributors
  - Pawel Lampe (Lampe Games)
+ 
+### Contributors
+
+<a href="https://github.com/lampe-games/godot-open-rts/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=lampe-games/godot-open-rts" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ### Assets
  - 3D Space Kit by [Kenney](https://www.kenney.nl/assets/space-kit)
