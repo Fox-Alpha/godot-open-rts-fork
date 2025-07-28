@@ -7,6 +7,7 @@ var _one_shot_timer = null
 var _range_check_timer = null
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
+@onready var _unit_movement_trait = _unit.find_child("Movement")
 
 
 func _init(target_unit):
@@ -17,13 +18,18 @@ func _ready():
 	if _teardown_if_out_of_range():
 		return
 	_target_unit.tree_exited.connect(_on_target_unit_removed)
+	if _unit_movement_trait != null:
+		# non-stationary units must hold shooting as long as passive movement is active
+		_unit_movement_trait.passive_movement_started.connect(_on_passive_movement_started)
+		_unit_movement_trait.passive_movement_finished.connect(_on_passive_movement_finished)
 	_setup_one_shot_timer()
 	_setup_range_check_timer()
 	_schedule_hit()
 
 
 func _physics_process(_delta):
-	_rotate_unit_towards_target()
+	if _unit_movement_trait == null:
+		_rotate_unit_towards_target()  # stationary units can rotate every frame
 
 
 func _setup_one_shot_timer():
@@ -62,28 +68,25 @@ func _schedule_hit():
 func _hit_target():
 	if _teardown_if_out_of_range():
 		return
-	_rotate_unit_towards_target()
 	_unit.set_meta(
 		"next_attack_availability_time", Time.get_ticks_msec() + int(_unit.attack_interval * 1000.0)
 	)
-	if _unit.visible:
-		var projectile = (
-			load(
-				Constants.Match.Units.PROJECTILES[_unit.get_script().resource_path.replace(
-					".gd", ".tscn"
-				)]
-			)
-			. instantiate()
+	var projectile = (
+		load(
+			Constants.Match.Units.PROJECTILES[_unit.get_script().resource_path.replace(
+				".gd", ".tscn"
+			)]
 		)
-		projectile.target_unit = _target_unit
-		_unit.add_child(projectile)
+		. instantiate()
+	)
+	projectile.target_unit = _target_unit
+	_unit.add_child(projectile)
 	_schedule_hit()
 
 
 func _teardown_if_out_of_range():
-	var self_position_yless = _unit.global_position * Vector3(1, 0, 1)
 	if (
-		self_position_yless.distance_to(_target_unit.global_position * Vector3(1, 0, 1))
+		_unit.global_position_yless.distance_to(_target_unit.global_position_yless)
 		> _unit.attack_range
 	):
 		queue_free()
@@ -93,3 +96,12 @@ func _teardown_if_out_of_range():
 
 func _on_target_unit_removed():
 	queue_free()
+
+
+func _on_passive_movement_started():
+	_one_shot_timer.stop()
+
+
+func _on_passive_movement_finished():
+	_rotate_unit_towards_target()
+	_schedule_hit()

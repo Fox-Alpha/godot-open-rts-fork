@@ -23,8 +23,12 @@ func _physics_process(_delta):
 		_recalcuate_orphaned_dummy_existence(orphaned_dummy, revealed_units)
 
 
+func _is_disabled():
+	return not visible
+
+
 func _recalculate_unit_visibility(unit, revealed_units = null):
-	if unit.is_in_group("revealed_units"):
+	if unit.is_in_group("revealed_units") or _is_disabled():
 		_update_unit_visibility(unit, true)
 		return
 
@@ -35,7 +39,8 @@ func _recalculate_unit_visibility(unit, revealed_units = null):
 		)
 	for revealed_unit in revealed_units:
 		if (
-			revealed_unit.sight_range != null
+			revealed_unit.is_revealing()
+			and revealed_unit.sight_range != null
 			and (
 				(revealed_unit.global_position * Vector3(1, 0, 1)).distance_to(
 					unit.global_position * Vector3(1, 0, 1)
@@ -85,7 +90,8 @@ func _recalcuate_orphaned_dummy_existence(orphaned_dummy, revealed_units = null)
 		)
 	for revealed_unit in revealed_units:
 		if (
-			revealed_unit.sight_range != null
+			revealed_unit.is_revealing()
+			and revealed_unit.sight_range != null
 			and (
 				(revealed_unit.global_position * Vector3(1, 0, 1)).distance_to(
 					orphaned_dummy.global_position * Vector3(1, 0, 1)
